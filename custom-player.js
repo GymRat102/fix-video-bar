@@ -96,9 +96,10 @@ function windForward() {
 
 media.addEventListener("timeupdate", setTime);
 
-function setTime() {
-  const minutes = Math.floor(media.currentTime / 60);
-  const seconds = Math.floor(media.currentTime - minutes * 60);
+function setTime(e, timeSetTo) {
+  let currentTime = timeSetTo || media.currentTime;
+  const minutes = Math.floor(currentTime / 60);
+  const seconds = Math.floor(currentTime - minutes * 60);
 
   const minuteValue = minutes.toString().padStart(2, "0");
   const secondValue = seconds.toString().padStart(2, "0");
@@ -106,8 +107,8 @@ function setTime() {
   const mediaTime = `${minuteValue}:${secondValue}`;
   timer.textContent = mediaTime;
 
-  const barLength =
-    timerWrapper.clientWidth * (media.currentTime / media.duration);
+  const barLength = timerWrapper.clientWidth * (currentTime / media.duration);
+  timerBar.style.width = `${barLength}px`;
 }
 
 timerWrapper.addEventListener("click", toJump);
@@ -115,12 +116,8 @@ timerWrapper.addEventListener("click", toJump);
 function toJump(e) {
   const timer = document.querySelector(".timer div");
   const rect = timer.getBoundingClientRect();
-  document.onclick = function (e) {
-    if (e.x < 500) {
-      let timerSeconds = `${(e.x - rect.x) * 0.6}`;
-      media.currentTime =
-        (timerSeconds / timerWrapper.clientWidth) * media.duration;
-      timerBar.style.width = `${e.x - rect.x}px`;
-    }
-  };
+  let currentTime =
+    ((e.x - rect.x) / timerWrapper.clientWidth) * media.duration;
+  media.currentTime = currentTime;
+  setTime(currentTime);
 }
